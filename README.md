@@ -49,6 +49,7 @@ sdd-workspace/
 │   ├── rules/                   # 通用工程规则
 │   └── wiki/                    # 领域知识索引骨架
 ├── dashboard/                   # 本地浏览变更的示例看板
+├── repo/                        # 实际放置代码仓库的目录
 ├── CHANGELOG.md
 └── README.md
 ```
