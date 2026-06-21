@@ -4,8 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
-CONFIG_FILE="${1:-$ROOT_DIR/.agents/config.yaml}"
-TARGET_ROOT="${2:-$ROOT_DIR/workspace-repos}"
+CONFIG_FILE="${1:-$ROOT_DIR/config.toml}"
+TARGET_ROOT="${2:-$ROOT_DIR/repos}"
 
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/sdd-config.sh"
@@ -19,7 +19,7 @@ if ! sdd_config_list_repos "$CONFIG_FILE" | grep -q .; then
   echo "=== CLONE_REPORT ==="
   echo "STATUS=SKIPPED"
   echo "REASON=NO_REPOS_CONFIGURED"
-  echo "CONFIG_FILE=.agents/config.yaml"
+  echo "CONFIG_FILE=config.toml"
   echo "=== END ==="
   exit 0
 fi
@@ -60,5 +60,5 @@ else
   echo "STATUS=PARTIAL"
   echo "FAILED=${failed# }"
 fi
-echo "CONFIG_FILE=.agents/config.yaml"
+echo "CONFIG_FILE=config.toml"
 echo "=== END ==="

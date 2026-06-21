@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
-CONFIG_FILE="$ROOT_DIR/.agents/config.yaml"
+CONFIG_FILE="$ROOT_DIR/config.toml"
 START_DOC="$ROOT_DIR/.agents/commands/sdd/start.md"
 CLOSE_DOC="$ROOT_DIR/.agents/commands/sdd/close.md"
 
@@ -95,7 +95,7 @@ main() {
 
   echo "=== SDD_BASE_BRANCH_REPORT ==="
   echo "BASE_BRANCH=$branch"
-  echo "CONFIG_FILE=.agents/config.yaml"
+  echo "CONFIG_FILE=config.toml"
   echo "UPDATED_DOCS=.agents/commands/sdd/start.md .agents/commands/sdd/close.md"
   echo "=== END ==="
 }

@@ -9,12 +9,13 @@ description: SDD 环境依赖检查与安装。首次使用 /sdd 时自动触发
 
 一次性、尽量少交互地完成 SDD 所有环境准备：依赖检查与安装、主干分支配置、状态落盘、工作仓库拉取。流程中持续打印进度；只有当脚本无法自动修复时，最终汇总提示手动操作。
 
-统一配置写入 `.agents/config.yaml`，其中至少维护两项：
+统一配置写入仓库根目录的 `config.toml`，其中至少维护两项：
 
-```yaml
-base_branch: main
-repos:
-  # - git@github.com:your-org/your-repo.git
+```toml
+base_branch = "main"
+repos = [
+  # "git@github.com:your-org/your-repo.git",
+]
 ```
 
 ## 触发条件
@@ -78,7 +79,7 @@ bash .agents/tools/clone-repos.sh
 
 解析 `CLONE_REPORT`，把 `FAILED=xxx` 中的仓库加入失败列表。
 
-如果 `.agents/config.yaml` 中 `repos` 为空，允许本步骤跳过，但需要在最终报告中说明“未配置聚合仓库清单”。
+如果 `config.toml` 中 `repos` 为空，允许本步骤跳过，但需要在最终报告中说明“未配置聚合仓库清单”。
 
 ### ▶ 步骤 5/5：汇总报告
 

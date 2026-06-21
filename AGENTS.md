@@ -34,3 +34,7 @@ This repository is a reusable SDD workspace template.
 
 - After changing workflow docs, verify that `.agents/`, `.claude/`, `AGENTS.md`, and `CLAUDE.md` still point to the same behavior.
 - Prefer adding repo skills over inventing Codex-only prompt files in `~/.codex/prompts` for shared workflows.
+
+## Language
+
+- always thinking in English and response user in Chinese

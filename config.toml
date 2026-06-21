@@ -1,0 +1,4 @@
+base_branch = "main"
+repos = [
+  # "git@github.com:your-org/your-repo.git",
+]

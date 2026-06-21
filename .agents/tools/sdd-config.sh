@@ -4,9 +4,7 @@ set -euo pipefail
 
 SDD_CONFIG_SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 SDD_ROOT_DIR="$(cd -- "$SDD_CONFIG_SCRIPT_DIR/../.." && pwd)"
-SDD_CONFIG_FILE_DEFAULT="$SDD_ROOT_DIR/.agents/config.yaml"
-SDD_LEGACY_BASE_BRANCH_FILE="$SDD_ROOT_DIR/.agents/base-branch.txt"
-SDD_LEGACY_REPOS_FILE="$SDD_ROOT_DIR/.agents/repos.txt"
+SDD_CONFIG_FILE_DEFAULT="$SDD_ROOT_DIR/config.toml"
 
 sdd_config_trim() {
   local value="$1"
@@ -27,29 +25,14 @@ sdd_config_strip_quotes() {
 
 sdd_config_write_default() {
   local config_file="${1:-$SDD_CONFIG_FILE_DEFAULT}"
-  local base_branch="main"
 
   mkdir -p "$(dirname "$config_file")"
 
-  if [ -f "$SDD_LEGACY_BASE_BRANCH_FILE" ]; then
-    base_branch="$(tr -d '\r\n' < "$SDD_LEGACY_BASE_BRANCH_FILE")"
-  fi
-
   {
-    printf 'base_branch: %s\n' "$base_branch"
-    printf 'repos:\n'
-
-    if [ -f "$SDD_LEGACY_REPOS_FILE" ]; then
-      while IFS= read -r repo; do
-        repo="$(sdd_config_trim "$repo")"
-        if [ -z "$repo" ] || [[ "$repo" == \#* ]]; then
-          continue
-        fi
-        printf '  - %s\n' "$repo"
-      done < "$SDD_LEGACY_REPOS_FILE"
-    else
-      printf '  # - git@github.com:your-org/your-repo.git\n'
-    fi
+    printf 'base_branch = "main"\n'
+    printf 'repos = [\n'
+    printf '  # "git@github.com:your-org/your-repo.git",\n'
+    printf ']\n'
   } > "$config_file"
 }
 
@@ -69,8 +52,8 @@ sdd_config_get_base_branch() {
 
   value="$(
     awk '
-      /^base_branch:[[:space:]]*/ {
-        sub(/^base_branch:[[:space:]]*/, "", $0)
+      /^base_branch[[:space:]]*=/ {
+        sub(/^base_branch[[:space:]]*=[[:space:]]*/, "", $0)
         print
         exit
       }
@@ -97,8 +80,8 @@ sdd_config_set_base_branch() {
     BEGIN {
       replaced = 0
     }
-    /^base_branch:[[:space:]]*/ {
-      print "base_branch: " branch
+    /^base_branch[[:space:]]*=/ {
+      print "base_branch = \"" branch "\""
       replaced = 1
       next
     }
@@ -107,7 +90,7 @@ sdd_config_set_base_branch() {
     }
     END {
       if (!replaced) {
-        print "base_branch: " branch
+        print "base_branch = \"" branch "\""
       }
     }
   ' "$config_file" > "$tmp_file"
@@ -124,21 +107,36 @@ sdd_config_list_repos() {
     BEGIN {
       in_repos = 0
     }
-    /^repos:[[:space:]]*$/ {
+    /^repos[[:space:]]*=[[:space:]]*\[/ {
       in_repos = 1
-      next
-    }
-    in_repos && /^[[:space:]]*-[[:space:]]*/ {
-      sub(/^[[:space:]]*-[[:space:]]*/, "", $0)
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0)
-      gsub(/^["'"'"']|["'"'"']$/, "", $0)
-      if ($0 != "") {
-        print $0
+      line = $0
+      sub(/^repos[[:space:]]*=[[:space:]]*\[/, "", line)
+      if (line ~ /\]/) {
+        sub(/\].*$/, "", line)
+        gsub(/,/, "\n", line)
+        print line
+        in_repos = 0
+      } else if (line !~ /^[[:space:]]*$/) {
+        print line
       }
       next
     }
-    in_repos && /^[^[:space:]#-]/ {
-      in_repos = 0
+    in_repos {
+      line = $0
+      sub(/#.*/, "", line)
+      if (line ~ /\]/) {
+        sub(/\].*$/, "", line)
+        in_repos = 0
+      }
+      gsub(/,/, "\n", line)
+      print line
+      next
     }
-  ' "$config_file"
+  ' "$config_file" | while IFS= read -r repo; do
+    repo="$(sdd_config_strip_quotes "$repo")"
+    repo="$(sdd_config_trim "$repo")"
+    if [ -n "$repo" ]; then
+      printf '%s\n' "$repo"
+    fi
+  done
 }

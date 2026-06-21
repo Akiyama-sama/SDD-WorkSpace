@@ -37,7 +37,6 @@
 ```text
 sdd-workspace/
 ├── .agents/
-│   ├── config.yaml              # 主干分支与聚合仓库清单
 │   ├── commands/
 │   │   ├── opsx/                # OpenSpec 相关命令说明
 │   │   └── sdd/                 # SDD 四阶段工作流命令说明
@@ -50,6 +49,7 @@ sdd-workspace/
 │   ├── rules/                   # 通用工程规则
 │   └── wiki/                    # 领域知识索引骨架
 ├── dashboard/                   # 本地浏览变更的示例看板
+├── config.toml                  # 主干分支与聚合仓库清单
 ├── repo/                        # 实际放置代码仓库的目录
 ├── CHANGELOG.md
 └── README.md
@@ -61,7 +61,7 @@ sdd-workspace/
 
 - 补齐你的本地工具链，例如 `openspec`、测试命令、AI 插件或技能。
 - 运行 `/sdd setup` 时，按提示设置你的主干分支（如 `main`、`master`、`develop`）。
-- 按需编辑 `.agents/config.yaml` 中的 `repos` 列表，维护你的聚合仓库清单。
+- 按需编辑根目录 `config.toml` 中的 `repos` 列表，维护你的聚合仓库清单。
 - 在 `vertical-knowledge/rules/` 中写入项目真实约束。
 
 ### 2. 需求理解
@@ -102,6 +102,10 @@ sdd-workspace/
 - 把 `.agents/tools/verify.sh` 中的检查命令改成你的项目脚本。
 - 把 `.agents/commands/sdd/*.md` 里的流程门槛改成你的团队习惯。
 - 把 `dashboard/` 看板标题、字段和筛选项改成你的变更元数据格式。
+
+## 配置项
+
+`config.toml`配置自定义工作区的主分支，以及多个仓库远程配置
 
 ## 看板
 

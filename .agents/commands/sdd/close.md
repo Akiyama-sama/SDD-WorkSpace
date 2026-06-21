@@ -243,7 +243,7 @@ SDD 流程完成
 git diff --cached --stat
 git diff --cached
 
-for REPO_DIR in workspace-repos/*/ repo/*/; do
+for REPO_DIR in repos/*/ repo/*/; do
   [ -d "$REPO_DIR/.git" ] || continue
   if ! git -C "$REPO_DIR" diff --cached --quiet 2>/dev/null; then
     echo "===== $(basename "$REPO_DIR") ====="
@@ -285,7 +285,7 @@ if [ "$CURRENT_SDD_BRANCH" = "$BASE_BRANCH" ]; then
   echo "⚠️ 当前 SDD 仓库在受保护主分支 ($BASE_BRANCH)，禁止直接提交！"
 fi
 
-for REPO_DIR in workspace-repos/*/ repo/*/; do
+for REPO_DIR in repos/*/ repo/*/; do
   [ -d "$REPO_DIR/.git" ] || continue
   REPO_BRANCH=$(git -C "$REPO_DIR" branch --show-current 2>/dev/null)
   if [ "$REPO_BRANCH" = "$BASE_BRANCH" ]; then
@@ -305,7 +305,7 @@ git commit -m "feat: [统一 commit message]"
 # 仅当用户选择“提交并推送”才执行：
 git push origin "$(git branch --show-current)"
 
-for REPO_DIR in workspace-repos/*/ repo/*/; do
+for REPO_DIR in repos/*/ repo/*/; do
   [ -d "$REPO_DIR/.git" ] || continue
   if ! git -C "$REPO_DIR" diff --cached --quiet 2>/dev/null; then
     REPO_BRANCH=$(git -C "$REPO_DIR" branch --show-current)

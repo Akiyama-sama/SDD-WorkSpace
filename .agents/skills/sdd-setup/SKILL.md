@@ -10,5 +10,5 @@ This skill is the Codex-compatible wrapper for the repository's `/sdd setup` wor
 ## Instructions
 
 1. Read `.agents/commands/sdd/setup.md` in full before acting.
-2. Use that file as the source of truth for environment preparation, dependency checks, shared YAML config (`base_branch` / `repos`), and repo preparation.
+2. Use that file as the source of truth for environment preparation, dependency checks, shared TOML config (`base_branch` / `repos`), and repo preparation.
 3. If the user mentions `/sdd setup` or asks to initialize the SDD workspace, follow the setup command doc.
