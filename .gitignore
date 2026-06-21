@@ -17,7 +17,4 @@ npm-debug.log*
 .agents/sdd-state.json
 .agents/tracking/
 .agents/config.local.json
-
-AGENTS.md
-CLAUDE.md
 .vscode/

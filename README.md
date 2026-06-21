@@ -8,6 +8,23 @@
 - 一套 `openspec/` 与知识库目录结构，帮助你把需求、决策、任务和长期知识沉淀为普通 Markdown。
 - 一些可选脚本与看板页面，用来做环境检查、验证和浏览变更产物。
 
+## Agent 兼容性
+
+这个模板目前兼容三类入口约定：
+
+- `AGENTS.md`
+  用作通用 Agent 规范入口，也是 Codex 官方推荐的项目级持久指导文件。
+- `.agents/skills`
+  用作 Codex 可发现的 repo 级 skills 目录。对于 SDD 工作流，Codex 通过 skills 使用这些流程。
+- `.claude/`
+  用作 Claude 兼容层，其中 `commands`、`skills`、`mcp` 都是指向 `.agents/` 的软链接。
+
+注意：
+
+- `.agents/` 是唯一真源。
+- `.claude/` 只是兼容层，不要在那里单独改内容。
+- 对 Codex 来说，项目内 `.agents/commands` 不是原生命令注册目录，所以仓库额外提供了对应的 repo skills 包装层。
+
 ## 设计原则
 
 - 文件即状态：流程进度写入文件，不依赖长会话上下文。
