@@ -67,30 +67,43 @@ replace_line() {
   ' "$file"
 }
 
-update_docs() {
-  local current_branch_label="$1"
-  local branch="$2"
+replace_branch_placeholder() {
+  local file="$1"
+  local pattern="$2"
+  local replacement="$3"
 
-  replace_line \
+  PATTERN="$pattern" REPLACEMENT="$replacement" perl -0pi -e '
+    my $pattern = $ENV{PATTERN};
+    my $replacement = $ENV{REPLACEMENT};
+
+    if ($_ !~ /$pattern/m) {
+      die "expected pattern not found in $ARGV\n";
+    }
+
+    s/$pattern/$replacement/gm;
+  ' "$file"
+}
+
+update_docs() {
+  local branch="$1"
+
+  replace_branch_placeholder \
     "$START_DOC" \
-    "检测当前分支是否为受保护主分支（当前模板配置：\`$current_branch_label\`）：" \
+    '检测当前分支是否为受保护主分支（当前模板配置：`[^`]+`）：' \
     "检测当前分支是否为受保护主分支（当前模板配置：\`$branch\`）："
 
-  replace_line \
+  replace_branch_placeholder \
     "$CLOSE_DOC" \
-    "- 任一仓库在受保护主分支（当前模板配置：\`$current_branch_label\`） → 强制中止，回退到 8.2 让用户重选“暂不提交”或先切换分支后重跑 close" \
+    '- 任一仓库在受保护主分支（当前模板配置：`[^`]+`） → 强制中止，回退到 8.2 让用户重选“暂不提交”或先切换分支后重跑 close' \
     "- 任一仓库在受保护主分支（当前模板配置：\`$branch\`） → 强制中止，回退到 8.2 让用户重选“暂不提交”或先切换分支后重跑 close"
 }
 
 main() {
   local branch
-  local current_branch_label
-
   branch="$(prompt_base_branch "${1:-}")"
   validate_base_branch "$branch"
-  current_branch_label="$(sdd_config_get_base_branch "$CONFIG_FILE")"
 
-  update_docs "$current_branch_label" "$branch"
+  update_docs "$branch"
   sdd_config_set_base_branch "$branch" "$CONFIG_FILE"
 
   echo "=== SDD_BASE_BRANCH_REPORT ==="

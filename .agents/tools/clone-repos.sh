@@ -14,8 +14,11 @@ mkdir -p "$TARGET_ROOT"
 
 failed=""
 cloned_any=0
+repo_list=""
 
-if ! sdd_config_list_repos "$CONFIG_FILE" | grep -q .; then
+repo_list="$(sdd_config_list_repos "$CONFIG_FILE")"
+
+if [ -z "$repo_list" ]; then
   echo "=== CLONE_REPORT ==="
   echo "STATUS=SKIPPED"
   echo "REASON=NO_REPOS_CONFIGURED"
@@ -46,7 +49,7 @@ while IFS= read -r repo; do
   else
     cloned_any=1
   fi
-done < <(sdd_config_list_repos "$CONFIG_FILE")
+done <<< "$repo_list"
 
 echo "=== CLONE_REPORT ==="
 if [ -z "$failed" ]; then
