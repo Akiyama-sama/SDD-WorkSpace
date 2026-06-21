@@ -277,21 +277,24 @@ done
 在执行任何 `git commit` 前，先做分支验证：
 
 ```bash
+# shellcheck source=/dev/null
+source .agents/tools/sdd-config.sh
+BASE_BRANCH="$(sdd_config_get_base_branch)"
 CURRENT_SDD_BRANCH=$(git -C . branch --show-current)
-if [ "$CURRENT_SDD_BRANCH" = "master" ] || [ "$CURRENT_SDD_BRANCH" = "main" ]; then
-  echo "⚠️ 当前 SDD 仓库在受保护主分支，禁止直接提交！"
+if [ "$CURRENT_SDD_BRANCH" = "$BASE_BRANCH" ]; then
+  echo "⚠️ 当前 SDD 仓库在受保护主分支 ($BASE_BRANCH)，禁止直接提交！"
 fi
 
 for REPO_DIR in workspace-repos/*/ repo/*/; do
   [ -d "$REPO_DIR/.git" ] || continue
   REPO_BRANCH=$(git -C "$REPO_DIR" branch --show-current 2>/dev/null)
-  if [ "$REPO_BRANCH" = "master" ] || [ "$REPO_BRANCH" = "main" ]; then
-    echo "⚠️ $(basename "$REPO_DIR") 仓库当前在受保护主分支！"
+  if [ "$REPO_BRANCH" = "$BASE_BRANCH" ]; then
+    echo "⚠️ $(basename "$REPO_DIR") 仓库当前在受保护主分支 ($BASE_BRANCH)！"
   fi
 done
 ```
 
-- 任一仓库在受保护主分支 → 强制中止，回退到 8.2 让用户重选“暂不提交”或先切换分支后重跑 close
+- 任一仓库在受保护主分支（当前模板配置：`main`） → 强制中止，回退到 8.2 让用户重选“暂不提交”或先切换分支后重跑 close
 - 所有仓库都在开发分支 → 进入 8.5
 
 #### 8.5 执行 commit / push（仅在用户明确选择后）

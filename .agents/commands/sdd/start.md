@@ -57,10 +57,15 @@ ls openspec/changes/*/impl-plan.md 2>/dev/null
 恢复到阶段三或阶段四时，额外执行分支一致性检查：
 
 ```bash
-git branch --show-current
+# shellcheck source=/dev/null
+source .agents/tools/sdd-config.sh
+BASE_BRANCH="$(sdd_config_get_base_branch)"
+CURRENT_BRANCH="$(git branch --show-current)"
+printf '当前模板配置的受保护主分支：%s\n' "$BASE_BRANCH"
+printf '当前分支：%s\n' "$CURRENT_BRANCH"
 ```
 
-检测当前分支是否为 `master` 或 `main`：
+检测当前分支是否为受保护主分支（当前模板配置：`main`）：
 
 - 若当前在受保护主分支 → 提示用户切换到开发分支后继续
 - 若当前在其他分支 → 提示用户确认这是本次需求的开发分支

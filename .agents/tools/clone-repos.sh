@@ -2,19 +2,27 @@
 
 set -euo pipefail
 
-REPO_LIST_FILE="${1:-.agents/repos.txt}"
-TARGET_ROOT="${2:-$(pwd)/workspace-repos}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
+CONFIG_FILE="${1:-$ROOT_DIR/.agents/config.yaml}"
+TARGET_ROOT="${2:-$ROOT_DIR/workspace-repos}"
 
-if [ ! -f "$REPO_LIST_FILE" ]; then
-  echo "[error] 仓库清单不存在：$REPO_LIST_FILE"
-  echo "[hint] 新建该文件，每行一个 git 地址，例如："
-  echo "       git@github.com:your-org/your-repo.git"
-  exit 1
-fi
+# shellcheck source=/dev/null
+source "$SCRIPT_DIR/sdd-config.sh"
 
 mkdir -p "$TARGET_ROOT"
 
 failed=""
+cloned_any=0
+
+if ! sdd_config_list_repos "$CONFIG_FILE" | grep -q .; then
+  echo "=== CLONE_REPORT ==="
+  echo "STATUS=SKIPPED"
+  echo "REASON=NO_REPOS_CONFIGURED"
+  echo "CONFIG_FILE=.agents/config.yaml"
+  echo "=== END ==="
+  exit 0
+fi
 
 while IFS= read -r repo; do
   repo="${repo#"${repo%%[![:space:]]*}"}"
@@ -35,14 +43,22 @@ while IFS= read -r repo; do
   echo "[clone] $repo"
   if ! git clone "$repo" "$dest"; then
     failed="$failed $name"
+  else
+    cloned_any=1
   fi
-done < "$REPO_LIST_FILE"
+done < <(sdd_config_list_repos "$CONFIG_FILE")
 
 echo "=== CLONE_REPORT ==="
 if [ -z "$failed" ]; then
-  echo "STATUS=OK"
+  if [ "$cloned_any" -eq 1 ]; then
+    echo "STATUS=OK"
+  else
+    echo "STATUS=SKIPPED"
+    echo "REASON=ALL_REPOS_ALREADY_PRESENT"
+  fi
 else
   echo "STATUS=PARTIAL"
   echo "FAILED=${failed# }"
 fi
+echo "CONFIG_FILE=.agents/config.yaml"
 echo "=== END ==="

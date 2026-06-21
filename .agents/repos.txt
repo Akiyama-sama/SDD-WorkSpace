@@ -1,4 +1,0 @@
-# One git URL per line.
-# Example:
-# git@github.com:your-org/app.git
-# git@github.com:your-org/design-system.git

@@ -37,11 +37,12 @@
 ```text
 sdd-workspace/
 ├── .agents/
+│   ├── config.yaml              # 主干分支与聚合仓库清单
 │   ├── commands/
 │   │   ├── opsx/                # OpenSpec 相关命令说明
 │   │   └── sdd/                 # SDD 四阶段工作流命令说明
 │   ├── skills/                  # 本仓自带技能说明
-│   └── tools/                   # 可选脚本：依赖检查、仓库拉取、验证
+│   └── tools/                   # 可选脚本：依赖检查、配置读取、仓库拉取、验证
 ├── openspec/
 │   ├── changes/                 # 活跃变更与归档示例
 │   └── specs/                   # 稳定规格沉淀
@@ -59,7 +60,8 @@ sdd-workspace/
 ### 1. 初始化
 
 - 补齐你的本地工具链，例如 `openspec`、测试命令、AI 插件或技能。
-- 按需编辑 `.agents/tools/clone-repos.sh` 或新增自己的仓库清单。
+- 运行 `/sdd setup` 时，按提示设置你的主干分支（如 `main`、`master`、`develop`）。
+- 按需编辑 `.agents/config.yaml` 中的 `repos` 列表，维护你的聚合仓库清单。
 - 在 `vertical-knowledge/rules/` 中写入项目真实约束。
 
 ### 2. 需求理解
